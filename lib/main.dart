@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(FunList());
 }
 
 class MyApp extends StatelessWidget {
@@ -11,18 +11,59 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class FunList extends StatelessWidget {
+  final List<ListItem> items = [
+    HeadingItem("Provider"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo"),
+    HeadingItem("demo")
+  ];
+
+  FunList({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "MaterialApp",
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text("AppBar"),
+        ),
+        body: ListView.separated(
+          // shrinkWrap: true,
+          // physics: NeverScrollableScrollPhysics(),
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            final item = items[index];
+            return ListTile(
+              title: item.buildTitle(context),
+              subtitle: item.buildSubTitle(context),
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) {
+            return new Divider(
+              height: 1.0,
+              color: Colors.blue,
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -101,4 +142,40 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+abstract class ListItem {
+  Widget buildTitle(BuildContext context);
+
+  Widget buildSubTitle(BuildContext context);
+}
+
+class HeadingItem implements ListItem {
+  final String heading;
+
+  HeadingItem(this.heading);
+
+  @override
+  Widget buildSubTitle(BuildContext context) {
+    return Text(
+      heading,
+      style: Theme.of(context).textTheme.headline5,
+    );
+  }
+
+  @override
+  Widget buildTitle(BuildContext context) => null;
+}
+
+class MessageItem implements ListItem {
+  final String sender;
+  final String body;
+
+  MessageItem(this.sender, this.body);
+
+  @override
+  Widget buildSubTitle(BuildContext context) => Text(this.sender);
+
+  @override
+  Widget buildTitle(BuildContext context) => Text(this.body);
 }
