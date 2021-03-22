@@ -1,41 +1,87 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_practice/models/function_items.dart';
+import 'package:flutter_practice/router/app_route_information_parser.dart';
+import 'package:flutter_practice/router/app_router_delegate.dart';
 
 void main() {
-  runApp(FunList());
+  runApp(Nav2App());
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class Nav2App extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => Nav2AppState();
+}
+
+class Nav2AppState extends State<Nav2App> {
+  AppRouterDelegate _routerDelegate = AppRouterDelegate();
+  AppRouteInformationParser _informationParser = AppRouteInformationParser();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MaterialApp.router(
+        title: 'Function',
+        routeInformationParser: _informationParser,
+        routerDelegate: _routerDelegate);
+  }
+}
+
+class UnknownScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("404!"),
+            TextButton(
+                child: Text("Pop"),
+                onPressed: () {
+                  Navigator.pop(context);
+                })
+          ],
+        ),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class FunList extends StatelessWidget {
-  final List<ListItem> items = [
-    HeadingItem("Provider"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo"),
-    HeadingItem("demo")
-  ];
+class FunctionDetailScreen extends StatelessWidget {
+  final FunctionItem functionItem;
 
-  FunList({Key key}) : super(key: key);
+  FunctionDetailScreen({
+    @required this.functionItem,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(functionItem.title),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (functionItem != null) ...[Text(functionItem.title)]
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FunListScreen extends StatelessWidget {
+  final List<FunctionItem> items;
+  final ValueChanged<FunctionItem> onTapped;
+
+  FunListScreen({
+    Key key,
+    @required this.items,
+    @required this.onTapped,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +98,8 @@ class FunList extends StatelessWidget {
           itemBuilder: (context, index) {
             final item = items[index];
             return ListTile(
-              title: item.buildTitle(context),
-              subtitle: item.buildSubTitle(context),
+              title: buildTitle(context, item.title),
+              onTap: () => onTapped(item),
             );
           },
           separatorBuilder: (BuildContext context, int index) {
@@ -66,116 +112,47 @@ class FunList extends StatelessWidget {
       ),
     );
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-}
-
-abstract class ListItem {
-  Widget buildTitle(BuildContext context);
-
-  Widget buildSubTitle(BuildContext context);
-}
-
-class HeadingItem implements ListItem {
-  final String heading;
-
-  HeadingItem(this.heading);
-
-  @override
-  Widget buildSubTitle(BuildContext context) {
+  Widget buildTitle(BuildContext context, String title) {
     return Text(
-      heading,
+      title,
       style: Theme.of(context).textTheme.headline5,
     );
   }
-
-  @override
-  Widget buildTitle(BuildContext context) => null;
 }
-
-class MessageItem implements ListItem {
-  final String sender;
-  final String body;
-
-  MessageItem(this.sender, this.body);
-
-  @override
-  Widget buildSubTitle(BuildContext context) => Text(this.sender);
-
-  @override
-  Widget buildTitle(BuildContext context) => Text(this.body);
-}
+//
+// abstract class ListItem {
+//   Widget buildTitle(BuildContext context);
+//
+//   Widget buildSubTitle(BuildContext context);
+// }
+//
+// class HeadingItem implements ListItem {
+//   final String heading;
+//
+//   HeadingItem(this.heading);
+//
+//   @override
+//   Widget buildSubTitle(BuildContext context) {
+//     return Text(
+//       heading,
+//       style: Theme.of(context).textTheme.headline5,
+//     );
+//   }
+//
+//   @override
+//   Widget buildTitle(BuildContext context) => null;
+// }
+//
+// class MessageItem implements ListItem {
+//   final String sender;
+//   final String body;
+//
+//   MessageItem(this.sender, this.body);
+//
+//   @override
+//   Widget buildSubTitle(BuildContext context) => Text(this.sender);
+//
+//   @override
+//   Widget buildTitle(BuildContext context) => Text(this.body);
+// }
